@@ -13,12 +13,7 @@ interface AuthenticatedRequest extends Request {
 export const verifyDevice = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { deviceId, deviceType } = req.body;
-    const userId = req./* In the provided TypeScript code snippet, the `user` object is being used to
-    store the authenticated user's information. It is accessed from the `req`
-    object, which is of type `AuthenticatedRequest`. The `userId` is extracted
-    from `req.user?.id`, which is then used to associate the device with the user
-    during device verification or device change request operations. */
-    user?.id; // From auth middleware
+    const userId = req.user?.id; // From auth middleware
     
     if (!userId) {
       res.status(401).json({
@@ -82,7 +77,7 @@ export const verifyDevice = async (req: AuthenticatedRequest, res: Response): Pr
  */
 export const requestDeviceChange = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const { deviceId, deviceType, accountNumber, transactionPin } = req.body;
+    const { deviceId, deviceType, accountNumber, phoneNumber, transactionPin } = req.body;
     const userId = req.user?.id; // From auth middleware
     
     if (!userId) {
@@ -93,20 +88,27 @@ export const requestDeviceChange = async (req: AuthenticatedRequest, res: Respon
       return;
     }
     
-    if (!deviceId || !deviceType || !accountNumber || !transactionPin) {
+    // Allow either accountNumber OR phoneNumber
+    if (!deviceId || !deviceType || (!accountNumber && !phoneNumber) || !transactionPin) {
       res.status(400).json({
         success: false,
-        message: 'Missing required fields'
+        message: 'Missing required fields. deviceId, deviceType, transactionPin, and either accountNumber or phoneNumber are required.'
       });
       return;
     }
     
-    // Verify account number and transaction PIN
-    const user = await User.findOne({ _id: userId, accountNumber });
+    // Verify user identity using either accountNumber or phoneNumber
+    let user;
+    if (accountNumber) {
+      user = await User.findOne({ _id: userId, accountNumber });
+    } else if (phoneNumber) {
+      user = await User.findOne({ _id: userId, phoneNumber });
+    }
+    
     if (!user) {
       res.status(404).json({
         success: false,
-        message: 'User not found or invalid account number'
+        message: 'User not found or invalid account/phone number'
       });
       return;
     }
@@ -140,6 +142,39 @@ export const requestDeviceChange = async (req: AuthenticatedRequest, res: Respon
     res.status(500).json({
       success: false,
       message: 'Device change request failed',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Get all devices for a user
+ */
+export const getUserDevices = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+      return;
+    }
+    
+    const devices = await Device.find({ userId });
+    
+    res.json({
+      success: true,
+      message: 'Devices retrieved successfully',
+      data: {
+        devices
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve devices',
       error: error.message
     });
   }

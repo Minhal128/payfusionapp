@@ -6,10 +6,13 @@ class InvestmentService {
     return Investment.find({});
   }
 
-  async createInvestment(amount: number, fundId: string): Promise<any> {
+  async createInvestment(userId: string, amount: number, fundId: string, investmentType: string, expectedReturn: number): Promise<any> {
     const investment = new Investment({
+      userId,
       amount,
       fundId,
+      investmentType,
+      expectedReturn,
       startDate: new Date(),
       status: 'active'
     });

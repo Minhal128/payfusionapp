@@ -33,7 +33,7 @@ export const validateTransactionPIN = (req: Request, res: Response, next: NextFu
 };
 export const validateTransaction = (req: Request, res: Response, next: NextFunction): void => {
   // Validate transaction data
-  const { amount, recipientId } = req.body;
+  const { amount, recipientPhone } = req.body;
   
   if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
     res.status(400).json({
@@ -43,10 +43,10 @@ export const validateTransaction = (req: Request, res: Response, next: NextFunct
     return;
   }
   
-  if (!recipientId) {
+  if (!recipientPhone) {
     res.status(400).json({
       success: false,
-      message: 'Recipient ID is required'
+      message: 'Recipient phone number is required'
     });
     return;
   }
@@ -78,7 +78,7 @@ export const validateOnboarding = (req: Request, res: Response, next: NextFuncti
   next();
 };
 export const validateRegistration = (req: Request, res: Response, next: NextFunction): void => {
-  const { firstName, lastName, email, phoneNumber, dob, gender } = req.body;
+  const { firstName, lastName, email, phoneNumber, dateOfBirth, gender } = req.body;
   const errors = [];
   
   // Validate first name
@@ -105,11 +105,11 @@ export const validateRegistration = (req: Request, res: Response, next: NextFunc
     errors.push('Phone number must be in international format (e.g., +1234567890)');
   }
   
-  // Validate date of birth
-  if (!dob) {
+  // Validate date of birth - CHANGED from dob to dateOfBirth
+  if (!dateOfBirth) {
     errors.push('Date of birth is required');
   } else {
-    const dobDate = new Date(dob);
+    const dobDate = new Date(dateOfBirth);
     const now = new Date();
     const ageInYears = (now.getTime() - dobDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
     

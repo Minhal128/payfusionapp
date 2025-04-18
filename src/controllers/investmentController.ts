@@ -21,17 +21,17 @@ class InvestmentController {
     }
 
     async createInvestment(req: Request, res: Response): Promise<Response> {
-        const { amount, fundId } = req.body;
+        const { userId, amount, fundId, investmentType, expectedReturn } = req.body;
 
-        if (!amount || !fundId) {
+        if (!userId || !amount || !fundId || !investmentType || !expectedReturn) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Amount and Fund ID are required',
+                message: 'UserId, amount, fundId, investmentType and expectedReturn are required',
             } as ResponseTypes);
         }
 
         try {
-            const newInvestment = await InvestmentService.createInvestment(amount, fundId);
+            const newInvestment = await InvestmentService.createInvestment(userId, amount, fundId, investmentType, expectedReturn);
             return res.status(201).json({
                 status: 'success',
                 message: 'Investment created successfully',

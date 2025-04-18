@@ -1,19 +1,27 @@
 import twilio from 'twilio';
 import { env } from '../config/env';
 
-// Initialize Twilio client
-const client = twilio(
+// Check if we're in development mode
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+// Initialize Twilio client only if not in development mode
+const client = !isDevelopment ? twilio(
   env.TWILIO_ACCOUNT_SID,
   env.TWILIO_AUTH_TOKEN
-);
+) : null;
 
 /**
- * Send OTP via SMS using Twilio
- * @param phoneNumber - Recipient's phone number in E.164 format
- * @param message - SMS message content
+ * Send OTP via SMS using Twilio or console log in development
  */
 export const sendOtp = async (phoneNumber: string, message: string): Promise<void> => {
   try {
+    // In development mode, just log the OTP
+    if (isDevelopment || !client) {
+      console.log(`[DEV MODE] Would send to ${phoneNumber}: ${message}`);
+      return;
+    }
+
+    // Real Twilio implementation for production
     await client.messages.create({
       body: message,
       from: env.TWILIO_PHONE_NUMBER,

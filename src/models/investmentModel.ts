@@ -9,7 +9,7 @@ const investmentSchema = new Schema({
     investmentType: {
         type: String,
         required: true,
-        enum: ['stocks', 'bonds', 'real estate', 'mutual funds', 'cryptocurrency']
+        enum: ['stocks', 'bonds', 'real estate', 'mutual funds', 'cryptocurrency','fixed','equity','bond']
     },
     amount: {
         type: Number,

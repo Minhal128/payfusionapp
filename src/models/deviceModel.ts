@@ -13,7 +13,7 @@ const deviceSchema = new Schema({
     },
     deviceType: {
         type: String,
-        enum: ['mobile', 'desktop', 'tablet'],
+        enum: ['mobile', 'desktop', 'tablet','android','ios'],
         required: true
     },
     lastLogin: {
