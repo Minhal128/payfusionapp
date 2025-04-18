@@ -1,4 +1,7 @@
 .qodo
+
 node_modules
-.env
+
 .vercel
+
+config.bat
