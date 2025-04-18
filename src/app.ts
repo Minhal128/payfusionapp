@@ -22,7 +22,17 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(responseHandler);
 app.use(errorHandler);
-
+// Health Check Endpoint
+app.get('/health', (req, res) => {
+    const healthInfo = {
+        status: 'up',
+        timestamp: new Date(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development'
+    };
+    
+    res.status(200).json(healthInfo);
+});
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/device', deviceRoutes);
